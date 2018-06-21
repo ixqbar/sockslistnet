@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+	<task>
+		<startup>true</startup>
+		<schedule>0 0 * * * *</schedule>
+	</task>
+	<redis_server>127.0.0.1:6379</redis_server>
+</config>
