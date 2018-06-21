@@ -113,3 +113,56 @@ func (obj *TProxy) Pull() {
 		})
 	})
 }
+
+func (obj *TProxy) GatherProxyPull() {
+	obj.Lock()
+	defer obj.Unlock()
+
+	request, err := http.NewRequest("GET", "http://www.gatherproxy.com/sockslist/country/?c=China", nil)
+	if err != nil {
+		Logger.Print(err)
+		return
+	}
+
+	request.Header.Set("Referer", "https://sockslist.net/")
+	request.Header.Set("User-Agent", randomdata.UserAgentString())
+	response, err := obj.httpClient.Do(request)
+	if err != nil {
+		Logger.Print(err)
+		return
+	}
+
+	defer response.Body.Close()
+
+	document, err := goquery.NewDocumentFromReader(response.Body)
+	if err != nil {
+		Logger.Print(err)
+		return
+	}
+
+	document.Find(".proxy-list table").Eq(0).Find("tr").Each(func(i int, selection *goquery.Selection) {
+		if i < 2 {
+			return
+		}
+
+		address := selection.Find("td").Eq(1).Text()
+		address = strings.TrimSpace(address)
+		address = strings.Replace(address, "document.write('", "", -1)
+		address = strings.Replace(address, "')", "", -1)
+		address = strings.TrimSpace(address)
+
+		port := selection.Find("td").Eq(2).Text();
+		port = strings.TrimSpace(port)
+		port = strings.Replace(port, "document.write('", "", -1)
+		port = strings.Replace(port, "')", "", -1)
+		port = strings.TrimSpace(port)
+
+		country := selection.Find("td").Eq(3).Text()
+		country = strings.TrimSpace(country)
+
+		category := selection.Find("td").Eq(5).Text()
+		category = strings.ToLower(strings.TrimSpace(category))
+
+		GlobalVars.TQueue.Push(TQueueItem{IsSock5, &TProxyItem{category, country, address, port, time.Now().Unix()}})
+	})
+}
