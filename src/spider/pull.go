@@ -114,6 +114,9 @@ func (obj *TProxy) Pull() {
 	})
 }
 
+/**
+ * for test
+ */
 func (obj *TProxy) GatherProxyPull() {
 	obj.Lock()
 	defer obj.Unlock()
@@ -145,6 +148,13 @@ func (obj *TProxy) GatherProxyPull() {
 			return
 		}
 
+		category := selection.Find("td").Eq(5).Text()
+		category = strings.ToLower(strings.TrimSpace(category))
+
+		if category != "sock5" {
+			return
+		}
+
 		address := selection.Find("td").Eq(1).Text()
 		address = strings.TrimSpace(address)
 		address = strings.Replace(address, "document.write('", "", -1)
@@ -160,9 +170,6 @@ func (obj *TProxy) GatherProxyPull() {
 		country := selection.Find("td").Eq(3).Text()
 		country = strings.TrimSpace(country)
 
-		category := selection.Find("td").Eq(5).Text()
-		category = strings.ToLower(strings.TrimSpace(category))
-
-		GlobalVars.TQueue.Push(TQueueItem{IsSock5, &TProxyItem{category, country, address, port, time.Now().Unix()}})
+		GlobalVars.TQueue.Push(TQueueItem{IsSock5, &TProxyItem{"socks5", country, address, port, time.Now().Unix()}})
 	})
 }
