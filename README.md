@@ -1,3 +1,9 @@
+
+[TOC]
+
+### desc
+* 定时抓取 https://sockslist.net/list/proxy-socks-5-list/ 代理并rpush到目标redis服务器对应List缓存key=proxy下
+
 ### usage
 ```
 ./proxy --config=config.xml
@@ -19,6 +25,7 @@ v0.0.1
 	<redis_server></redis_server>
 </config>
 ```
+* schedule 语法可以参考 https://godoc.org/github.com/robfig/cron
 
 ### target website
 * https://sockslist.net/list/proxy-socks-5-list/
